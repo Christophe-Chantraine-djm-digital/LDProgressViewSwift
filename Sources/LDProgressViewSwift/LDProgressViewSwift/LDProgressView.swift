@@ -8,6 +8,7 @@
 
 import UIKit
 
+// Enum representing the types of progress visualization
 enum LDProgressType {
     case stripes
     case gradient
@@ -15,19 +16,30 @@ enum LDProgressType {
 }
 
 open class LDProgressView: UIView {
+    
+    /// The type of progress bar used, which can be either stripes or gradient.
     var type = LDProgressType.stripes
+
     
     private var _progress: Float = 0.0
+    
+    /// The current progress value of the progress bar.
     open var progress: Float {
         set {
+            // Set the target progress for animation
             self.progressToAnimateTo = newValue
             
+            // Check if animation is enabled
             if self.animate {
+                // Invalidate any existing animation timer
                 if self.animationTimer != nil {
                     self.animationTimer!.invalidate()
                 }
+                
+                // Schedule a new animation timer
                 self.animationTimer = Timer.scheduledTimer(timeInterval: 0.008, target: self, selector: #selector(incrementAnimatingProgress), userInfo: nil, repeats: true)
             } else {
+                // Update the progress value and trigger a redraw
                 _progress = newValue
                 self.setNeedsDisplay()
             }
@@ -37,12 +49,19 @@ open class LDProgressView: UIView {
         }
     }
     
+    /// The progress value used for label display.
     var labelProgress: Float = 0.0
     
+    /// The target progress value for animation.
     var progressToAnimateTo: Float = 0.0
+    
+    /// The timer used for handling animation.
     var animationTimer: Timer?
+
     
     private var _gradientProgress: UIImage?
+    
+    /// A gradient image for the progress bar.
     var gradientProgress: UIImage {
         get {
             if _gradientProgress == nil {
@@ -69,18 +88,25 @@ open class LDProgressView: UIView {
         }
     }
     
+    /// The color of the progress bar.
     var color: UIColor = UIColor.RGB(0.07, 0.56, 1.0) {
         didSet {
+            // Reset the gradient progress image when the color changes
             _gradientProgress = nil
         }
     }
+    
+    /// The background color of the progress bar.
     var background: UIColor = UIColor.RGB(0.51, 0.51, 0.51)
     
+    /// Determines whether the progress bar has a flat style.
     var flat: Bool = false
     
+    /// Determines whether the progress bar animation is enabled.
     var animate = true {
         didSet {
             if animate {
+                // Start or stop the animation timer based on the animate setting
                 self.timer = Timer.scheduledTimer(timeInterval: 0.02, target: self, selector: #selector(incrementOffset), userInfo: nil, repeats: true)
             } else if self.timer != nil {
                 self.timer!.invalidate()
@@ -88,21 +114,42 @@ open class LDProgressView: UIView {
             }
         }
     }
+
+    
+    /// Determines whether the progress text label is displayed.
     open var showText = true
+    
+    /// Determines whether the outer stroke is displayed.
     open var showStroke = true
+    
+    /// Determines whether the progress background is displayed.
     open var showBackground = true
+    
+    /// Determines whether the background inner shadow effect is displayed.
     open var showBackgroundInnerShadow = true
     
+    /// The width of the outer stroke.
     open var outerStrokeWidth: Float?
+    
+    /// The inset for the progress bar.
     open var progressInset: Float?
     
+    /// An optional override for the progress text label.
     open var progressTextOverride: String?
+    
+    /// Overrides the default progress text with a custom string.
+    /// - Parameter progressText: The custom progress text to display.
     func overrideProgressText(_ progressText: String) {
         self.progressTextOverride = progressText
+        
+        // Trigger a redraw of the view to display the updated text
         self.setNeedsDisplay()
     }
-    
+
     private var _borderRadius: Float?
+    
+    /// The radius of the corner for the progress bar's rounded rectangle.
+    /// If not explicitly set, it defaults to half of the view's height.
     var borderRadius: Float {
         get {
             if _borderRadius == nil {
@@ -116,32 +163,40 @@ open class LDProgressView: UIView {
         }
     }
     
+    /// The width of the stripes in the progress bar, varies based on the type of progress.
     open var stripeWidth: Float {
         get {
             switch type {
-            case .gradient:
-                return 15.0
-            default:
-                return 50
+                case .gradient:
+                    return 15.0
+                default:
+                    return 50
             }
         }
     }
     
+    /// The size of the stripes in the progress bar.
     open var stripeSize: CGSize = CGSize(width: 0, height: 0)
     
-    
+    /// The offset for creating animation of stripes.
     open var offset: Float = 0.0
-    open var timer: Timer?
     
+    /// The timer used for handling animation.
+    open var timer: Timer?
+    /// Initializes the progress bar with a specified frame.
+    /// - Parameter frame: The frame for the progress bar.
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .clear
     }
     
+    /// Required initializer when creating the view from a storyboard or nib.
+    /// - Parameter aDecoder: The NSCoder instance used for decoding.
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// Increments the offset value for creating animation of stripes and triggers a redraw.
     @objc func incrementOffset() {
         if self.offset >= 0 {
             self.offset = -self.stripeWidth
@@ -151,6 +206,7 @@ open class LDProgressView: UIView {
         self.setNeedsDisplay()
     }
 
+    /// Incrementally adjusts the progress value for animation purposes and triggers a redraw.
     @objc func incrementAnimatingProgress() {
         if self.progress >= self.progressToAnimateTo - 0.01 && self.progress <= self.progressToAnimateTo + 0.01 {
             _progress = self.progressToAnimateTo
@@ -160,12 +216,13 @@ open class LDProgressView: UIView {
         }
         self.setNeedsDisplay()
     }
-    
-    
 }
 
 //MARK: - Draw
 extension LDProgressView {
+    
+    /// Custom drawing method that handles drawing the progress bar based on the provided settings.
+    /// - Parameter rect: The rectangle in which the progress bar will be drawn.
     override open func draw(_ rect: CGRect) {
         let context = UIGraphicsGetCurrentContext()!
         
@@ -182,6 +239,10 @@ extension LDProgressView {
         }
     }
     
+    /// Draws the background of the progress bar with various effects using a given graphics context within the specified rectangle.
+    /// - Parameters:
+    ///   - context: The graphics context in which the progress background will be drawn.
+    ///   - rect: The rectangle in which the progress background will be drawn.
     func drawProgressBackground(context: CGContext, rect: CGRect) {
         context.saveGState()
         
@@ -212,6 +273,10 @@ extension LDProgressView {
         roundedRect.addClip()
     }
     
+    /// Draws an outer stroke around the specified rectangle using a given graphics context.
+    /// - Parameters:
+    ///   - context: The graphics context in which the outer stroke will be drawn.
+    ///   - rect: The rectangle around which the outer stroke will be drawn.
     func drawOuterStroke(context: CGContext, rect: CGRect) {
         let outerStrokeWidth = self.outerStrokeWidth ?? 0
         let bezierPath = UIBezierPath(roundedRect: rect.insetBy(dx: CGFloat(outerStrokeWidth / 2.0), dy: CGFloat(outerStrokeWidth / 2.0)), cornerRadius: CGFloat(self.borderRadius))
@@ -220,6 +285,10 @@ extension LDProgressView {
         bezierPath.stroke()
     }
     
+    /// Draws progress with various visual effects using a given graphics context within the specified frame.
+    /// - Parameters:
+    ///   - context: The graphics context in which the progress will be drawn.
+    ///   - frame: The frame within which the progress will be drawn.
     func drawProgress(context: CGContext, frame: CGRect) {
         let rectToDrawIn = CGRect(x: frame.origin.x, y: frame.origin.y, width: frame.size.width * CGFloat(self.progress), height: frame.size.height)
         var insetRect = rectToDrawIn.insetBy(dx: self.progress > 0.03 ? 0.5 : -0.5, dy: 0.5)
@@ -270,6 +339,10 @@ extension LDProgressView {
         }
     }
     
+    /// Draws gradients using a given graphics context within the specified rectangle.
+    /// - Parameters:
+    ///   - context: The graphics context in which the gradients will be drawn.
+    ///   - rect: The rectangle in which the gradients will be drawn.
     func drawGradients(context: CGContext, rect: CGRect) {
         self.stripeSize = CGSize(width: CGFloat(self.stripeWidth), height: rect.size.height)
         context.saveGState()
@@ -283,7 +356,10 @@ extension LDProgressView {
         context.restoreGState()
     }
     
-    
+    /// Draws diagonal stripes using a given graphics context within the specified rectangle.
+    /// - Parameters:
+    ///   - context: The graphics context in which the stripes will be drawn.
+    ///   - rect: The rectangle in which the stripes will be drawn.
     func drawStripes(context: CGContext, rect: CGRect) {
         context.saveGState()
         UIBezierPath(roundedRect: rect, cornerRadius: CGFloat(self.borderRadius)).addClip()
@@ -309,7 +385,8 @@ extension LDProgressView {
         context.restoreGState()
     }
     
-    
+    /// Draws a right-aligned label within the given rectangle, if the width of the rectangle is greater than 40.
+    /// - Parameter rect: The rectangle in which the label should be drawn.
     func drawRightAlignedLabelInRect(_ rect: CGRect) {
         if rect.size.width > 40 {
             let label = UILabel(frame: rect)
