@@ -186,13 +186,14 @@ open class LDProgressView: UIView {
     /// - Parameter frame: The frame for the progress bar.
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.backgroundColor = .clear
+        initialize()
     }
     
     /// Required initializer when creating the view from a storyboard or nib.
     /// - Parameter aDecoder: The NSCoder instance used for decoding.
     required public init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        super.init(coder: aDecoder)
+        initialize()
     }
     
     /// Increments the offset value for creating animation of stripes and triggers a redraw.
@@ -214,6 +215,10 @@ open class LDProgressView: UIView {
             _progress = _progress < self.progressToAnimateTo ? _progress + 0.01 : _progress - 0.01
         }
         self.setNeedsDisplay()
+    }
+    
+    private func initialize() {
+        self.backgroundColor = .clear
     }
 }
 
