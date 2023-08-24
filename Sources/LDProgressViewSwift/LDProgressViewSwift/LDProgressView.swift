@@ -9,7 +9,7 @@
 import UIKit
 
 // Enum representing the types of progress visualization
-enum LDProgressType {
+public enum LDProgressType {
     case stripes
     case gradient
     case solid
@@ -18,9 +18,8 @@ enum LDProgressType {
 open class LDProgressView: UIView {
     
     /// The type of progress bar used, which can be either stripes or gradient.
-    var type = LDProgressType.stripes
+    public var type = LDProgressType.stripes
 
-    
     private var _progress: Float = 0.0
     
     /// The current progress value of the progress bar.
@@ -50,19 +49,19 @@ open class LDProgressView: UIView {
     }
     
     /// The progress value used for label display.
-    var labelProgress: Float = 0.0
+    public var labelProgress: Float = 0.0
     
     /// The target progress value for animation.
-    var progressToAnimateTo: Float = 0.0
+    public var progressToAnimateTo: Float = 0.0
     
     /// The timer used for handling animation.
-    var animationTimer: Timer?
+    public var animationTimer: Timer?
 
     
     private var _gradientProgress: UIImage?
     
     /// A gradient image for the progress bar.
-    var gradientProgress: UIImage {
+    public var gradientProgress: UIImage {
         get {
             if _gradientProgress == nil {
                 UIGraphicsBeginImageContext(self.stripeSize)
@@ -89,7 +88,7 @@ open class LDProgressView: UIView {
     }
     
     /// The color of the progress bar.
-    var color: UIColor = UIColor.RGB(0.07, 0.56, 1.0) {
+    public var color: UIColor = UIColor.RGB(0.07, 0.56, 1.0) {
         didSet {
             // Reset the gradient progress image when the color changes
             _gradientProgress = nil
@@ -97,13 +96,13 @@ open class LDProgressView: UIView {
     }
     
     /// The background color of the progress bar.
-    var background: UIColor = UIColor.RGB(0.51, 0.51, 0.51)
+    public var background: UIColor = UIColor.RGB(0.51, 0.51, 0.51)
     
     /// Determines whether the progress bar has a flat style.
-    var flat: Bool = false
+    public var flat: Bool = false
     
     /// Determines whether the progress bar animation is enabled.
-    var animate = true {
+    public var animate = true {
         didSet {
             if animate {
                 // Start or stop the animation timer based on the animate setting
@@ -150,7 +149,7 @@ open class LDProgressView: UIView {
     
     /// The radius of the corner for the progress bar's rounded rectangle.
     /// If not explicitly set, it defaults to half of the view's height.
-    var borderRadius: Float {
+    public var borderRadius: Float {
         get {
             if _borderRadius == nil {
                 return Float(self.frame.size.height / 2.0)
